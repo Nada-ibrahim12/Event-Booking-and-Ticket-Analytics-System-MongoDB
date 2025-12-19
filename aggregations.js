@@ -12,7 +12,8 @@ db.bookings.aggregate([
         }
     },
     { $unwind: "$event" }, 
-    { $group: { _id: "$event.name", Total_Revenue: { $sum:  "$tickets.price"} } } 
+    { $group: { _id: "$event.name", Total_Revenue: { $sum:  "$tickets.price"} } } ,
+    { $project: { Event: "$_id", Total_Revenue: 1, _id: 0 } }
 ]);
 
 //3. Top users by number of bookings
