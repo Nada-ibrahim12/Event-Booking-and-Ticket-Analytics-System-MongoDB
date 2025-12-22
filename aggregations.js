@@ -1,5 +1,7 @@
 //1. Tickets sold per event
 
+
+
 //2. Revenue per event
 db.bookings.aggregate([
     { $unwind: "$tickets" },
@@ -16,7 +18,10 @@ db.bookings.aggregate([
     { $project: { Event: "$_id", Total_Revenue: 1, _id: 0 } }
 ]);
 
+
 //3. Top users by number of bookings
+
+
 
 //4. Event popularity ranking
 db.bookings.aggregate([

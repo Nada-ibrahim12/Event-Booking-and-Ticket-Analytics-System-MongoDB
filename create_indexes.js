@@ -1,10 +1,12 @@
-// use event_booking
+// use event_booking_system
+
 
 // Create collections
 db.createCollection("users");
 db.createCollection("venues");
 db.createCollection("events");
 // db.createCollection("bookings");
+
 
 db.createCollection("bookings", {
   validator: {
@@ -26,5 +28,3 @@ db.createCollection("bookings", {
 // Create indexes
 db.users.createIndex({ email: 1 }, { unique: true });
 db.bookings.createIndex({ userId: 1, eventId: 1 }, { unique: true });
-
-

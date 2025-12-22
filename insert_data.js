@@ -10,6 +10,7 @@ var users = db.users.insertMany([
   { name: "Laila", email: "laila@mail.com" }
 ]);
 
+
 // 4 Venues
 var venues = db.venues.insertMany([
   { name: "Opera", capacity: 500, location: "Downtown" },
@@ -17,6 +18,7 @@ var venues = db.venues.insertMany([
   { name: "Cairo Stadium", capacity: 800, location: "Uptown" },
   { name: "Egyptian Theater", capacity: 400, location: "Old Town" }
 ]);
+
 
 // 6 Events
 var events = db.events.insertMany([
@@ -27,6 +29,7 @@ var events = db.events.insertMany([
   { name: "Art Exhibition", date: new Date("2026-05-01"), price: 80, venueId: venues.insertedIds[1], totalTicketsSold: 0 },
   { name: "Startup Meetup", date: new Date("2026-05-15"), price: 50, venueId: venues.insertedIds[0], totalTicketsSold: 0 }
 ]);
+
 
 // 15 Booking — Tickets embedded
 db.bookings.insertMany([
@@ -154,5 +157,3 @@ db.bookings.insertMany([
     status: "confirmed"
   }
 ]);
-
-
