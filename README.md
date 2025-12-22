@@ -1,4 +1,4 @@
-# Event Booking and Ticket Analytics System
+# Event Booking and Ticket Analytics System - MongoDB
 
 ## 1. Database Schema and Design Decisions
 The database is designed around four main collections:
