@@ -32,18 +32,36 @@ db.events.updateOne(
     { $set: { price: 300 } }
 );
 
+//4 Function to cancel a booking with update totalTicketsSold
+function cancelBooking(bookingId) {
+    const booking = db.bookings.findOne({
+        _id: bookingId,
+        status: "confirmed"
+    });
 
-//4 cancel booking and update available seats
-db.bookings.updateOne(
-    { _id: ObjectId("6945b1212dbee611f7892369") },
-    { $set: { status: "cancelled" } }
-);
-// decrement tickets sold based on number of tickets in the booking
-const booking = db.bookings.findOne({ _id: ObjectId("6945b1212dbee611f7892369") });
-db.events.updateOne(
-    { _id: booking.eventId },
-    { $inc: { totalTicketsSold: -booking.tickets.length } }
-);
+    if (!booking) {
+        print("Booking not found or already canceled");
+        return;
+    }
+
+    const ticketsCount = booking.tickets.length;
+
+    db.bookings.updateOne(
+        { _id: bookingId },
+        { $set: { status: "cancelled" } }
+    );
+
+    db.events.updateOne(
+        { _id: booking.eventId },
+        { $inc: { totalTicketsSold: -ticketsCount } }
+    );
+
+    print("Booking cancelled successfully");
+}
+
+cancelBooking(ObjectId("694932adef6f5fcfe018dedc"));
+
+db.bookings.findOne({ _id: ObjectId("694932adef6f5fcfe018dedc") })
 
 
 //5 get user details and bookings with event info using lookup
