@@ -1,12 +1,14 @@
-//1. Tickets sold per event
-db.bookings.aggregate([
+// 1. Tickets sold per event
+db.bookings.aggregate
+([
     { $unwind: "$tickets" },
     {
-        $lookup: {
-        from: "events",
-        localField: "eventId",  // field from the bookings collection
-        foreignField: "_id", // field from the events collection
-        as: "event"
+        $lookup:
+        {
+            from: "events",
+            localField: "eventId",
+            foreignField: "_id",
+            as: "event"
         }
     },
     { $unwind: "$event" },
@@ -15,27 +17,31 @@ db.bookings.aggregate([
 ]);
 
 
-//2. Revenue per event
-db.bookings.aggregate([
+// 2. Revenue per event
+db.bookings.aggregate
+([
     { $unwind: "$tickets" },
     {
-        $lookup: {
-        from: "events", 
-        localField: "eventId",  // field from the bookings collection
-        foreignField: "_id", // field from the events collection
-        as: "event"
+        $lookup:
+        {
+            from: "events",
+            localField: "eventId",
+            foreignField: "_id",
+            as: "event"
         }
     },
     { $unwind: "$event" }, 
-    { $group: { _id: "$event.name", Total_Revenue: { $sum:  "$tickets.price"} } } ,
-    { $project: { Event: "$_id", Total_Revenue: 1, _id: 0 } }
+    { $group: { _id: "$event.name", totalRevenue: { $sum:  "$tickets.price"} } },
+    { $project: { event: "$_id", totalRevenue: 1, _id: 0 } }
 ]);
 
 
-//3. Top users by number of bookings
-db.bookings.aggregate([
+// 3. Top users by number of bookings
+db.bookings.aggregate
+([
     {
-        $lookup: {
+        $lookup:
+        {
             from: "users",
             localField: "userId",
             foreignField: "_id",
@@ -50,25 +56,29 @@ db.bookings.aggregate([
 ])
 
 
-//4. Event popularity ranking
-db.bookings.aggregate([
-    {$unwind: "$tickets"},
+// 4. Event popularity ranking
+db.bookings.aggregate
+([
+    { $unwind: "$tickets" },
     {
-        $lookup: {
-        from: "events",
-        localField: "eventId",
-        foreignField: "_id",
-        as: "event"
+        $lookup:
+
+        {
+            from: "events",
+            localField: "eventId",
+            foreignField: "_id",
+            as: "event"
         }
     },
     { $unwind: "$event" },
-    { $group: { _id: "$event.name", Tickets_Sold: { $sum: 1 } } },
-    { $sort: { Tickets_Sold: -1 } }, // Sort by tickets sold in descending order
+    { $group: { _id: "$event.name", ticketsSold: { $sum: 1 } } },
+    { $sort: { ticketsSold: -1 } },
     {
-        $setWindowFields: {
-        sortBy: { Tickets_Sold: -1 },
-        output: { denseRank: { $denseRank: {} } }
+        $setWindowFields:
+        {
+            sortBy: { ticketsSold: -1 },
+            output: { denseRank: { $denseRank: {} } }
         }
     },
-    { $project: { Event: "$_id", Tickets_Sold: 1, Rank: "$denseRank", _id: 0 } }
+    { $project: { event: "$_id", ticketsSold: 1, Rank: "$denseRank", _id: 0 } }
 ]);

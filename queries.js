@@ -1,21 +1,27 @@
-//1 find event by date range
-db.events.find({
-    date: {
+// 1. Find event by date range
+db.events.find
+({
+    date:
+    {
         $gte: ISODate("2026-01-01"),
         $lte: ISODate("2026-12-31")
     }
 }).sort({ date: 1 });
 
 
-//2 find bookings by user
-db.bookings.find({
-    userId: ObjectId("6945b1212dbee611f7892358")
+// 2. Find bookings by user
+db.bookings.find
+({
+    userId: ObjectId("<userId>") // Enter a valid user ID from your DB
 });
-// 2 include event details
-db.bookings.aggregate([
-    { $match: { userId: ObjectId("6945b1212dbee611f7892358") } },
+
+// 2. Find bookings by user and include event details
+db.bookings.aggregate
+([
+    { $match: { userId: ObjectId("<userId>") } }, // Enter a valid user ID from your DB
     {
-        $lookup: {
+        $lookup:
+        {
             from: "events",
             localField: "eventId",
             foreignField: "_id",
@@ -26,49 +32,54 @@ db.bookings.aggregate([
 ]);
 
 
-//3 update event price
-db.events.updateOne(
-    { _id: ObjectId("6945b1212dbee611f7892363") },
+// 3. Update event price
+db.events.updateOne
+(
+    { _id: ObjectId("<eventId>") }, // Enter a valid event ID from your DB
     { $set: { price: 300 } }
 );
 
-//4 Function to cancel a booking with update totalTicketsSold
-function cancelBooking(bookingId) {
-    const booking = db.bookings.findOne({
+
+// 4. Function to cancel a booking with update totalTicketsSold
+function cancelBooking(bookingId)
+{
+    const booking = db.bookings.findOne
+    ({
         _id: bookingId,
         status: "confirmed"
     });
-
-    if (!booking) {
+    if (!booking)
+    {
         print("Booking not found or already canceled");
         return;
     }
 
     const ticketsCount = booking.tickets.length;
-
-    db.bookings.updateOne(
+    db.bookings.updateOne
+    (
         { _id: bookingId },
         { $set: { status: "cancelled" } }
     );
 
-    db.events.updateOne(
+    db.events.updateOne
+    (
         { _id: booking.eventId },
         { $inc: { totalTicketsSold: -ticketsCount } }
     );
-
     print("Booking cancelled successfully");
 }
 
-cancelBooking(ObjectId("694932adef6f5fcfe018dedc"));
+cancelBooking(ObjectId("<bookingId>")); // Enter a valid booking ID from your DB
+db.bookings.findOne({ _id: ObjectId("<bookinId>") }) // Enter the same booking ID as the previous line
 
-db.bookings.findOne({ _id: ObjectId("694932adef6f5fcfe018dedc") })
 
-
-//5 get user details and bookings with event info using lookup
-db.users.aggregate([
-    { $match: { _id: ObjectId("6945b1212dbee611f7892358") } },
+// 5. Get user details and bookings with event info using lookup
+db.users.aggregate
+([
+    { $match: { _id: ObjectId("<userId>") } }, // Enter a valid user ID from your DB
     {
-        $lookup: {
+        $lookup:
+        {
             from: "bookings",
             localField: "_id",
             foreignField: "userId",
@@ -77,7 +88,8 @@ db.users.aggregate([
     },
     { $unwind: "$bookings" },
     {
-        $lookup: {
+        $lookup:
+        {
             from: "events",
             localField: "bookings.eventId",
             foreignField: "_id",
@@ -86,7 +98,8 @@ db.users.aggregate([
     },
     { $unwind: "$bookings.eventDetails" },
     {
-        $group: {
+        $group:
+        {
             _id: "$_id",
             name: { $first: "$name" },
             email: { $first: "$email" },
@@ -96,17 +109,20 @@ db.users.aggregate([
 ]);
 
 
-//6 count confirmed bookings for an event
-db.bookings.countDocuments({
-    eventId: ObjectId("6945b1212dbee611f7892365"),
+// 6. Count confirmed bookings for an event
+db.bookings.countDocuments
+({
+    eventId: ObjectId("<eventId>"), // Enter a valid event ID from your DB
     status: "confirmed"
 });
 
 
-//7 list events with available seats and all its details in other tables
-db.events.aggregate([
+// 7, List events with available seats and all its details in other tables
+db.events.aggregate
+([
     {
-        $lookup: {
+        $lookup:
+        {
             from: "venues",
             localField: "venueId",
             foreignField: "_id",
@@ -115,7 +131,8 @@ db.events.aggregate([
     },
     { $unwind: "$venueDetails" },
     {
-        $addFields: {
+        $addFields:
+        {
             availableSeats: { $subtract: ["$venueDetails.capacity", "$totalTicketsSold"] }
         }
     },
@@ -124,10 +141,12 @@ db.events.aggregate([
 ]);
 
 
-//8 get total amount for all bookings
-db.bookings.aggregate([
+// 8. Get total amount for all bookings
+db.bookings.aggregate
+([
     {
-        $group: {
+        $group:
+        {
             _id: null,
             totalAmount: { $sum: "$totalAmount" },
             bookingCount: { $sum: 1 },
@@ -135,7 +154,8 @@ db.bookings.aggregate([
         }
     },
     {
-        $project: {
+        $project:
+        {
             _id: 0,
             totalAmount: 1,
             bookingCount: 1,
@@ -145,25 +165,28 @@ db.bookings.aggregate([
 ]);
 
 
-//9 find venues in a specific city
+// 9. Find venues in a specific city
 db.venues.find({ city: "New York" });
 
 
-//10 list events by venue
-db.events.find({ venueId: ObjectId("<venueId>") });
+// 10. List events by venue
+db.events.find({ venueId: ObjectId("<venueId>") }); // Enter a valid venue ID from your DB
 
 
-//11 get total tickets sold for an event
-db.events.find(
-    { _id: ObjectId("<eventId>") },
+// 11. Get total tickets sold for an event
+db.events.find
+(
+    { _id: ObjectId("<eventId>") }, // Enter a valid event ID from your DB
     { totalTicketsSold: 1, _id: 0 }
 );
 
 
-//12 list users who have never booked
-db.users.aggregate([
+// 12. List users who have never booked
+db.users.aggregate
+([
     {
-        $lookup: {
+        $lookup:
+        {
             from: "bookings",
             localField: "_id",
             foreignField: "userId",
@@ -174,18 +197,20 @@ db.users.aggregate([
 ]);
 
 
-//13 get highest priced event
+// 13. Get highest priced event
 db.events.find().sort({ price: -1 }).limit(1);
 
 
-//14 get most sold out events
+// 14. Get most sold out events
 db.events.find().sort({ totalTicketsSold: -1 }).limit(5);
 
 
-//15 get most active users by number of bookings
-db.bookings.aggregate([
+// 15. Get most active users by number of bookings
+db.bookings.aggregate
+([
     {
-        $group: {
+        $group:
+        {
             _id: "$userId",
             bookingCount: { $sum: 1 }
         }
@@ -193,7 +218,8 @@ db.bookings.aggregate([
     { $sort: { bookingCount: -1 } },
     { $limit: 5 },
     {
-        $lookup: {
+        $lookup:
+        {
             from: "users",
             localField: "_id",
             foreignField: "_id",
@@ -202,7 +228,8 @@ db.bookings.aggregate([
     },
     { $unwind: "$userDetails" },
     {
-        $project: {
+        $project:
+        {
             _id: 0,
             userId: "$_id",
             name: "$userDetails.name",
@@ -213,10 +240,12 @@ db.bookings.aggregate([
 ]);
 
 
-//16 Find events that are sold out
-db.events.aggregate([
+// 16. Find events that are sold out
+db.events.aggregate
+([
     {
-        $lookup: {
+        $lookup:
+        {
             from: "venues",
             localField: "venueId",
             foreignField: "_id",
@@ -225,7 +254,8 @@ db.events.aggregate([
     },
     { $unwind: "$venueDetails" },
     {
-        $addFields: {
+        $addFields:
+        {
             availableSeats: { $subtract: ["$venueDetails.capacity", "$totalTicketsSold"] }
         }
     },
@@ -233,16 +263,19 @@ db.events.aggregate([
 ]);
 
 
-//17 list events with revenue generated per event
-db.bookings.aggregate([
+// 17. List events with revenue generated per event
+db.bookings.aggregate
+([
     {
-        $group: {
+        $group:
+        {
             _id: "$eventId",
             totalRevenue: { $sum: "$totalAmount" }
         }
     },
     {
-        $lookup: {
+        $lookup:
+        {
             from: "events",
             localField: "_id",
             foreignField: "_id",
@@ -251,7 +284,8 @@ db.bookings.aggregate([
     },
     { $unwind: "$eventDetails" },
     {
-        $project: {
+        $project:
+        {
             _id: 0,
             eventId: "$_id",
             eventName: "$eventDetails.name",

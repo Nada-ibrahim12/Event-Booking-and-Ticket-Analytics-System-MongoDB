@@ -5,23 +5,26 @@
 db.createCollection("users");
 db.createCollection("venues");
 db.createCollection("events");
-// db.createCollection("bookings");
 
 
-db.createCollection("bookings", {
-  validator: {
-    $jsonSchema: {
-      bsonType: "object",
-      properties: {
-        tickets: {
-        // at least one ticket object
-          bsonType: "array",
-          minItems: 1,
-          items: { bsonType: "object" } 
+db.createCollection("bookings",
+{
+    validator:
+    {
+        $jsonSchema:
+        {
+            bsonType: "object",
+            properties:
+            {
+                tickets:
+                {
+                    bsonType: "array",
+                    minItems: 1,
+                    items: { bsonType: "object" }
+                }
+            }
         }
-      }
     }
-  }
 });
 
 
