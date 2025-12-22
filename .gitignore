@@ -1,1 +1,42 @@
+# OS-specific files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store
+
+# IDE / Editor files
+.idea/
+*.iml
+.vscode/
+
+# Node.js / JavaScript
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+pnpm-lock.yaml
+
+# Logs & Temp files
+*.log
+*.tmp
+*.swp
+*.bak
+
+# Coverage / Testing
+coverage/
+.nyc_output/
+jest-results.json
+
+# Build / Dist
+dist/
+build/
+out/
+
+# MongoDB data dumps
+dump/
+*.bson
+*.mongodump
+
+# JSON files
 data.json
